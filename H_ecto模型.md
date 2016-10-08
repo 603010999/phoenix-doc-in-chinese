@@ -11,12 +11,15 @@
 
 新生成的 Phoenix 应用默认集成了 Ecto 以及 PostgreSQL 数据库的适配器。
 
-如果相对 Ecto 有一个快速全面的了解，请查看 [Ecto 入门手册](https://hexdocs.pm/ecto/getting-started.html)
+如果相对 Ecto 有一个快速全面的了解，请查看
+[Ecto 入门手册](https://hexdocs.pm/ecto/getting-started.html)。想要概览 Phoenix
+相关的所有 Ecto mix 相关任务，请查看[mix tasks guide](http:www.phoenixframework.org/docs/mix-tasks#section-ecto-specific-mix-tasks).
 
 这篇指南假设我们是使用 Ecto 来生成的工程。如果我们在使用一个老版本的 Phoenix 应用，或者我们在生成项目时使用了
 `--no-ecto` 选项。请阅读下面的章节 'Integrating Ecto into an Existing Application'
 
-这篇指南同时假设我们使用的数据库是 PostgreSQL, 如果你要使用 MySQL, 请查看 [MySQL 指南](http://www.phoenixframework.org/docs/using-mysql)。
+这篇指南同时假设我们使用的数据库是 PostgreSQL, 如果你要使用 MySQL, 请查看
+[MySQL 指南](https://mydearxym.gitbooks.io/phoenix-doc-in-chinese/content/%E8%BF%9B%E9%98%B6%E5%86%85%E5%AE%B9/E_%E4%BD%BF%E7%94%A8MySQL.html)。
 
 当我们安装并配置好了 `Ecto` 以及 `PostgreSQL`, 最简单的使用 Ecto 模型的方法就是使用 `phoenix.gen.html` 任务生
 成一个 `资源`。我们就来生成一个包含 `name`, `email`, `bio` 和 `number_of_pets` 字段的 *User* 模型。
@@ -44,9 +47,8 @@ and then update your repository by running migrations:
     $ mix ecto.migrate
 ```
 
-注意这个任务生成了很多东西： 一个迁移(migration), 一个控制器，一个控制器的测试，一个模型，一个模型测试，一个视
-图，以及一些模板。( a migration, a controller, a controller test, a model, a model test, a view, and
-a number of templates.)
+注意这个任务生成了很多东西： 一个迁移(migration), 一个控制器，一个控制器的测试，
+一个模型，一个模型测试，一个视图，以及一些模板。
 
 让我们先来看看 'web/router.ex' 中添加的这行 `resources "/users", UserController`:
 
@@ -91,17 +93,17 @@ Generated hello_phoenix.app
 ```
 
 啊哦! 这里的错误消息提示我们现在并没有创建 Ecto 所期望的数据库，目前，我们希望创建的数据库是
-`hello_phoenix_dev` - `_dev` 后缀表明现在是测试数据库。
+`hello_phoenix_dev` - `_dev` 后缀表明现在是开发数据库。
 
-Ecto 解决这个问题很简单，只需要运行： `ecto.create` 任务:
+解决这个问题很简单，只需要运行： `ecto.create` 任务:
 
 ```console
 $ mix ecto.create
 The database for repo HelloPhoenix.Repo has been created.
 ```
 
-Mix 会默认我们处于 开发环境，除非我们使用`MIX_ENV=another_environment`明确指定当前环境. 我们的Ecto 任务会从
-Mix 中得到环境变量, 并由此决定我们数据库名称的后缀。
+Mix 会默认我们处于开发环境，除非我们在命令行上使用`MIX_ENV=another_environment`明确指定当前环境. 我们的`Ecto任务`会从
+Mix 中得到环境变量, 并由此决定我们数据库名称的后缀 (比如之前的 `hello_phoenix_dev`)。
 
 现在我们的迁移任务可以正常运行了：
 
@@ -225,7 +227,7 @@ defmodule HelloPhoenix.User do
     field :bio, :string
     field :number_of_pets, :integer
 
-    timestamps()
+    timestamps
   end
 
   @doc """
@@ -244,7 +246,7 @@ end
 
 #### Changesets and Validations
 
-Changesets 定义了在渲染之前一个转换数据的管道机制，这些转换包括验证必要数据、数据验证、过滤掉无关的参数等等。
+Changesets 定义了了一个在渲染之前清洗转换数据的机制，这些转换包括验证必要数据、数据验证、过滤掉无关的参数等等。
 
 让我们看看一个默认的 changeset 。
 
@@ -412,7 +414,6 @@ Email has invalid format
 中。
 
 让我们来仔细看看 Ecto 是怎么在这个生成的控制器中起作用的。
-不过在开始前还是先做一个简单的别名映射，以节省体力（之后可以用 `%User{}` 代替 `%HelloPhoenix.User{}` 了）。
 
 ```elixir
 defmodule HelloPhoenix.UserController do
@@ -439,8 +440,8 @@ end
 
 
 现在，再来看看 new action, 注意这里我们使用了一个 changeset, 即便 new action 本身并不需要任何参数（它只是发送
-一个空表单到前端），这里需要 changeset 的理由是我们在其他页面比如创建页面出错时可能会重定向到 new action, 需要
-显示错误信息什么的。
+一个空表单到前端），这里需要 changeset 的理由是我们在其他页面比如创建页面出错时
+可能会重定向到 new action, 而这时需要显示错误信息什么的。
 
 ```elixir
 def new(conn, _params) do
@@ -472,8 +473,8 @@ changeset是合法的，它会返回 {:ok, user} 包含刚刚插入的 user 模�
 
 如果插入失败了，我们重新渲染 new.html 页面给用户，并显示错误信息。
 
-在 show action 中，我们用内建的 `Repo.get!/2` 函数，根据请求的 id 找到目标 user， 这里没有使用 changeset 是因
-为我们任务数据库里的数据是合法的。
+在 show action 中，我们用内建的 `Repo.get!/2` 函数，根据请求的 id 找到目标 user，
+这里没有使用 changeset 是因为我们认为数据库里的数据是合法的。
 
 和 index 类似。
 
@@ -547,15 +548,15 @@ $ mix phoenix.gen.model Video videos name:string approved_at:datetime descriptio
 $ mix ecto.migrate
 ```
 
-如果我们要编写一个现代的网页应用，只处理独立的表是不行的，我们需要将数据关联起来，类似于 Ruby 的 ActiveRecord，
-Ecto 也提供了类似的语法糖来处理这些关系，比如：
+如果我们要编写一个现代的网页应用，只处理独立的表是不行的，我们需要将数据关联起来，
+就像 Ruby 的 ActiveRecord，Ecto 也提供了类似的语法糖来处理这些关系，比如：
 
-`Schema.has_many/3` 声明`一对多`关系,比如，在我们的视频分享应用中，一个 user 可能会上传多个 video 。
+- `Schema.has_many/3` 声明`一对多`关系,比如，在我们的视频分享应用中，一个 user 可能会上传多个 video 。
 
-`Schema.belongs_to/3` 声明父子式的 `属于` 关系 比如，一个 video 只属于一个 user。
+- `Schema.belongs_to/3` 声明父子式的 `属于` 关系 比如，一个 video 只属于一个 user。
 
-`Schema.has_one/3` 声明`一对一`关系。和 `has_many` 类似，只是返回的不是模型的集合而是一个模型。比如用户上传了
-很多 video, 但他可能只喜欢其中的一个。
+- `Schema.has_one/3` 声明 `一对一` 关系。和 `has_many` 类似，只是返回的不是模型
+的集合而是一个模型。比如用户上传了很多 video,但他可能只喜欢其中的一个。
 
 这是一个在 `web/models/user.ex` 中声明 `has_many` 的例子：
 
@@ -569,13 +570,13 @@ defmodule HelloPhoenix.User do
     field :number_of_pets, :integer
 
     has_many :videos, HelloPhoenix.Video
-    timestamps()
+    timestamps
   end
 . . .
 end
 ```
 
-因为之前我们是使用的生成器来生成的 `Video` 模型，并显示的用`user_id:references:users` 制定了它的从属关系,所以
+因为之前我们是使用的生成器来生成的 `Video` 模型，并明确的用 `user_id:references:users` 制定了它的从属关系,所以
 `belongs_to` 内容被自动添加到了 `web/models/video.ex` 中：
 
 ```elixir
@@ -589,7 +590,7 @@ defmodule HelloPhoenix.Video do
     field :views, :integer
     belongs_to :user, HelloPhoenix.User
 
-    timestamps()
+    timestamps
   end
 . . .
 end

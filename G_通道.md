@@ -32,7 +32,7 @@ Channels 处理客户端的事件，所以和控制器有点类似，但它们�
 
 Phoenix 的发布订阅层由 `Phoenix.PubSub` 模块以及 `GenServer`s 的各种适配器模块们组成 (a variety of modules for different adapters and their `GenServer`s)。实现 Channel 通信的各种功能 -- 订阅/取消订阅 主题， 对某一主题广播消息等。
 
-如果需要，我们也可以定义我们自己的 PubSub 适配器。详情可以在 [Phoenix.PubSub docs](http://hexdocs.pm/phoenix/Phoenix.PubSub.html) 查看。
+如果需要，我们也可以定义我们自己的 PubSub 适配器。详情可以在 [Phoenix.PubSub docs](http://hexdocs.pm/phoenix_pubsub/Phoenix.PubSub.html) 查看。
 
 
 需要注意的是，这些模块是在 Phoenix 内部使用的。Channels 在幕后使用他们来实现功能，作为终端用户（end users），我们并不需要直接在我们的应用中使用他们。
@@ -144,30 +144,18 @@ import socket from "./socket"
 <input id="chat-input" type="text"></input>
 ```
 
-我们还需要在 `web/templates/layout/app.html.eex` 布局文件中引入 jQuery。
-
-```html
-  ...
-    <%= render @view_module, @view_template, assigns %>
-
-  </div> <!-- /container -->
-  <script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
-  <script src="<%= static_path(@conn, "/js/app.js") %>"></script>
-</body>
-```
-
 然后在 `web/static/js/socket.js` 中添加一些事件监听 (event listeners)。
 
 ```javascript
 ...
 let channel           = socket.channel("rooms:lobby", {})
-let chatInput         = $("#chat-input")
-let messagesContainer = $("#messages")
+let chatInput         = document.querySelector("#chat-input")
+let messagesContainer = document.querySelector("#messages")
 
-chatInput.on("keypress", event => {
+chatInput.addEventListener("keypress", event => {
   if(event.keyCode === 13){
-    channel.push("new_msg", {body: chatInput.val()})
-    chatInput.val("")
+    channel.push("new_msg", {body: chatInput.value})
+    chatInput.value = ""
   }
 })
 
@@ -177,24 +165,25 @@ channel.join()
 
 export default socket
 ```
-
 我们监听 "new_msg" 然后将其添加到页面的消息容器中。
 
 ```javascript
 ...
 let channel           = socket.channel("rooms:lobby", {})
-let chatInput         = $("#chat-input")
-let messagesContainer = $("#messages")
+let chatInput         = document.querySelector("#chat-input")
+let messagesContainer = document.querySelector("#messages")
 
-chatInput.on("keypress", event => {
+chatInput.addEventListener("keypress", event => {
   if(event.keyCode === 13){
-    channel.push("new_msg", {body: chatInput.val()})
-    chatInput.val("")
+    channel.push("new_msg", {body: chatInput.value})
+    chatInput.value = ""
   }
 })
 
 channel.on("new_msg", payload => {
-  messagesContainer.append(`<br/>[${Date()}] ${payload.body}`)
+  let messageItem = document.createElement("li");
+  messageItem.innerText = `[${Date()}] ${payload.body}`
+  messagesContainer.appendChild(messageItem)
 })
 
 channel.join()

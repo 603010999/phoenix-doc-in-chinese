@@ -371,11 +371,11 @@ $ mix phoenix.gen.model Admin.User users name:string age:integer
 
 #### `mix phoenix.gen.channel`
 
-这个生成器会产生一个基本的 Phoenix 通道以及相应的测试用例。  它只需要两个参数： channel 的模块名以及复数形式的
-话题名称 (topic)。
+这个生成器会产生一个基本的 Phoenix 通道以及相应的测试用例。channel 接收一个
+ module 名字作为参数：
 
 ```console
-$ mix phoenix.gen.channel Room rooms
+$ mix phoenix.gen.channel Room
 * creating web/channels/room_channel.ex
 * creating test/channels/room_channel_test.exs
 ```
@@ -485,6 +485,12 @@ Check your digested files at 'priv/static'.
 * gzip 压缩过的文件。
 * 在文件名中包含指纹的文件。
 * 压缩过的、在文件名中包含指纹的文件。
+
+我们还可以使用 `:gzippable_exts` 选项来对某些后缀的文件启用 gzip 压缩 :
+
+```elixir
+config :phoenix, :gzippable_exts, ~w(.js .css)
+```
 
 > 注意: 我们可以给 `phoenix.digest` 任务指定目标编译目录（第一个参数） -- 如果我们想把他们放在其他目录的话。
 
